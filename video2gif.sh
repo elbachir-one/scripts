@@ -21,4 +21,4 @@ ffmpeg -y -i "$input" \
 	[s1][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" \
 	"$output"
 
-echo "✅ GIF saved as: $output"
+echo "GIF saved as: $output"
