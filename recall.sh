@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Storing screenshots temporarily
 SCREENSHOT_DIR="/tmp/shots"
@@ -10,7 +10,6 @@ SERVER_DIR="/media/Shots"
 mkdir -p "$SCREENSHOT_DIR"
 
 upload_screenshots() {
-
 	# Upload all screenshots
 	scp "$SCREENSHOT_DIR"/*.png "$SERVER_USER@$SERVER_IP:$SERVER_DIR"
 

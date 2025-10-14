@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+# Convert markdown files to pdfs
 
 INPUT=$(find . -type f -name "*.md" | head -n 1)
 

@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-#
 # Opening websites in Chromium app mode using dmenu with icons.
-#
 
 options=(
 "Knowledge HUB|https://elbachir.org"

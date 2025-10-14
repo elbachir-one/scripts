@@ -1,7 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Screen Recorder with Multiple Options
-# Requirements: ffmpeg, dmenu, slop
 
 function stop_recording() {
 	kill "$ffmpeg_pid" 2>/dev/null
@@ -10,31 +9,27 @@ function stop_recording() {
 
 trap stop_recording SIGINT
 
-# Set output directory
 output_dir="$HOME/Recordings"
 mkdir -p "$output_dir"
 
-# Ask for filename
 output_file=$(echo "" | dmenu -p "File name:")
 if [ -z "$output_file" ]; then
 	exit 1
 fi
 
-# Choose recording mode
-mode=$(echo -e "Record 1366x768\nRecord 1920x1080\nSelect Area\nRecord Both Screens" | dmenu -p "Select recording mode:")
+mode=$(echo -e "Laptop 1366x768\nHDMI 1920x1080\nSelect Area\nRecord Both Screens" | dmenu -p "Select recording mode:")
 
 case "$mode" in
-	"Record 1366x768")
+	"Laptop 1366x768")
 		video_size="1366x768"
 		offset="0,0"
 		ffmpeg -framerate 30 -f x11grab -video_size "$video_size" -i :0.0+"$offset" \
 			-preset ultrafast -crf 8 "$output_dir/$output_file" &
 		;;
 
-	"Record 1920x1080")
+	"HDMI 1920x1080")
 		video_size="1920x1080"
-		# Adjust the offset if your second monitor starts after 1366px
-		offset="1366,0"
+		offset="0,0"
 		ffmpeg -framerate 30 -f x11grab -video_size "$video_size" -i :0.0+"$offset" \
 			-preset ultrafast -crf 8 "$output_dir/$output_file" &
 		;;

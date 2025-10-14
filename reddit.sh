@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-# How to use it
-# ./reddit.sh subreddit
+# Download images from reddit
+# How to use it ./reddit.sh subreddit 10
+
 SUB="$1"
 NUM="$2"
 

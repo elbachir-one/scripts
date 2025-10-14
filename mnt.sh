@@ -1,17 +1,7 @@
 #!/usr/bin/env bash
+
 #
 # Mount/unmount drives and MTP phones via dmenu
-#
-# Features:
-#   - Mount/unmount regular partitions (via sudo mount/umount).
-#   - Mount/unmount MTP devices (via simple-mtpfs + fusermount).
-#   - Auto-detects available devices and shows them in dmenu.
-#   - Sends notifications via dunst (if running).
-#
-# Requirements:
-#   - dmenu, lsblk, sudo
-#   - simple-mtpfs, fusermount (for phone support)
-#   - notify-send + dunst (optional for notifications)
 #
 
 PHONE_MOUNT="$HOME/Phone"
