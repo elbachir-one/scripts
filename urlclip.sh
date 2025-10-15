@@ -7,7 +7,6 @@
 LIST_FILE="$HOME/Documents/Bookmarks/bookmarks.txt"
 TUBE_FILE="$HOME/Videos/list.txt"
 LAST=""
-LAST_DATE=""
 
 touch "$LIST_FILE" "$TUBE_FILE"
 
@@ -21,6 +20,17 @@ while true; do
 	if ! [[ "$CLIP" =~ ^https?://[^[:space:]]+$ ]]; then
 		sleep 1
 		continue
+	fi
+
+	if [[ "$CLIP" =~ \.git$ ]] \
+		|| [[ "$CLIP" =~ /v?[0-9]+(\.[0-9]+)*$ ]] \
+		|| [[ "$CLIP" =~ \.zip$ ]] \
+		|| [[ "$CLIP" =~ \.gz$ ]] \
+		|| [[ "$CLIP" =~ \.tar$ ]] \
+		|| [[ "$CLIP" =~ \.iso$ ]] \
+		; then
+			sleep 1
+			continue
 	fi
 
 	URL="$CLIP"
@@ -62,13 +72,15 @@ while true; do
 
 	if [[ "$TARGET_FILE" == "$LIST_FILE" ]]; then
 		TODAY=$(date '+%Y-%m-%d')
-		if [[ "$TODAY" != "$LAST_DATE" ]]; then
+
+		LAST_DATE_IN_FILE=$(tac "$LIST_FILE" | grep -m1 -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+		if [[ "$TODAY" != "$LAST_DATE_IN_FILE" ]]; then
 			{
 				echo ""
 				echo "$TODAY"
 			} >> "$LIST_FILE"
-			LAST_DATE="$TODAY"
 		fi
+
 		echo "$CLEANED" >> "$LIST_FILE"
 
 	elif [[ "$TARGET_FILE" == "$TUBE_FILE" ]]; then
