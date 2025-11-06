@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Past URLs
+
+bookmark=$(grep -v '^#' ~/Documents/Bookmarks/bookmarks.txt | dmenu -l 20 | cut -d' ' -f1)
+
+if [ -n "$bookmark" ]; then
+	echo -n "$bookmark" | xclip -selection clipboard
+
+	# For Wayland users, use:
+	# echo -n "$bookmark" | wl-copy
+
+	notify-send "Bookmark copied" "$bookmark has been copied to the clipboard."
+fi

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# Store URLs
+
+bookmark="$(xclip -o)"
+file="$HOME/Documents/Bookmarks/bookmarks.txt"
+
+mkdir -p "$(dirname "$file")"
+
+if [ -z "$bookmark" ]; then
+	notify-send "No bookmark found in clipboard."
+	exit 1
+fi
+
+if printf '%s' "$bookmark" | grep -E -q '^https?://'; then
+	if grep -Fxq -- "$bookmark" "$file" 2>/dev/null; then
+		notify-send "Already Bookmarked" "\"$bookmark\" is already saved."
+	else
+		{ printf '%s\n' "$bookmark"; cat "$file"; } > "$file.tmp" && mv "$file.tmp" "$file"
+			notify-send "Added Bookmark" "\"$bookmark\" is now saved at the top."
+	fi
+else
+	notify-send "Not a URL" "\"$bookmark\" is not a valid URL."
+	exit 1
+fi
