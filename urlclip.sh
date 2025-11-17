@@ -28,6 +28,10 @@ while true; do
 		|| [[ "$CLIP" =~ \.gz$ ]] \
 		|| [[ "$CLIP" =~ \.tar$ ]] \
 		|| [[ "$CLIP" =~ \.iso$ ]] \
+		|| [[ "$CLIP" =~ \.st$ ]] \
+		|| [[ "$CLIP" =~ \.patch$ ]] \
+		|| [[ "$CLIP" =~ \.txt$ ]] \
+		|| [[ "$CLIP" =~ \.qcow2$ ]] \
 		; then
 			sleep 1
 			continue
