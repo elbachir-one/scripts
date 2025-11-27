@@ -12,16 +12,13 @@ action=$(printf "Mount\nUnmount" | dmenu -i -p "Choose action:")
 
 # Mount logic
 if [[ "$action" == "Mount" ]]; then
-	# Check if phone is connected
 	devices=$(simple-mtpfs -l 2>/dev/null)
 
 	menu=""
-	# Add unmounted drives
 	drives=$(lsblk -lpno NAME,TYPE,SIZE,MOUNTPOINT | awk '$2=="part" && $4=="" {print $1 " (drive " $3 ")"}')
 	[[ -n "$drives" ]] && menu+="$drives"$'\n'
 
-	# Add phone devices if found
-	[[ -n "$devices" ]] && menu+=$(echo "$devices" | sed 's/^/Phone: /')
+	[[ -n "$devices" ]] && menu+="Phone: ${devices//$'\n'/$'\n'Phone: }"
 
 	[[ -z "$menu" ]] && notify-send "Mount" "No devices available" && exit 1
 
@@ -29,7 +26,6 @@ if [[ "$action" == "Mount" ]]; then
 
 	[[ -z "$chosen" ]] && exit 1
 
-	# Handle phone mount
 	if [[ "$chosen" == Phone:* ]]; then
 		index=$(echo "$chosen" | awk -F: '{print $2}' | awk '{print $1}')
 		[ -d "$PHONE_MOUNT" ] || mkdir -p "$PHONE_MOUNT"
@@ -43,7 +39,6 @@ if [[ "$action" == "Mount" ]]; then
 		exit 0
 	fi
 
-	# Handle drive mount
 	chosen_dev=$(echo "$chosen" | awk '{print $1}')
 
 	if sudo mount "$chosen_dev" 2>/dev/null; then
@@ -70,11 +65,9 @@ if [[ "$action" == "Mount" ]]; then
 elif [[ "$action" == "Unmount" ]]; then
 	menu=""
 
-	# Add mounted drives (exclude system mounts)
 	drives=$(lsblk -lpno NAME,SIZE,MOUNTPOINT | awk '$3!="" && $3!~/^(\/boot|\/home|\/)$/ {print $1 " (drive " $2 ") on " $3}')
 	[[ -n "$drives" ]] && menu+="$drives"$'\n'
 
-	# Add phone if mounted
 	if mount | grep -q "on $PHONE_MOUNT type fuse.simple-mtpfs"; then
 		menu+="Phone at $PHONE_MOUNT"$'\n'
 	fi
@@ -84,13 +77,11 @@ elif [[ "$action" == "Unmount" ]]; then
 	chosen=$(echo "$menu" | dmenu -i -p "Select device to unmount:")
 	[[ -z "$chosen" ]] && exit 0
 
-	# --- Handle phone unmount ---
 	if [[ "$chosen" == Phone* ]]; then
 		fusermount -u "$PHONE_MOUNT" && notify-send "Phone unmounted"
 		exit 0
 	fi
 
-	# Handle drive unmount
 	chosen_dev=$(echo "$chosen" | awk '{print $1}')
 	mountpoint=$(lsblk -lpno NAME,MOUNTPOINT | awk -v dev="$chosen_dev" '$1==dev {print $2}')
 
