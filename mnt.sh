@@ -6,11 +6,9 @@
 
 PHONE_MOUNT="$HOME/Phone"
 
-# Prompt for main action
 action=$(printf "Mount\nUnmount" | dmenu -i -p "Choose action:")
 [[ -z "$action" ]] && exit 0
 
-# Mount logic
 if [[ "$action" == "Mount" ]]; then
 	devices=$(simple-mtpfs -l 2>/dev/null)
 
@@ -23,7 +21,6 @@ if [[ "$action" == "Mount" ]]; then
 	[[ -z "$menu" ]] && notify-send "Mount" "No devices available" && exit 1
 
 	chosen=$(echo "$menu" | dmenu -i -p "Select device to mount:")
-
 	[[ -z "$chosen" ]] && exit 1
 
 	if [[ "$chosen" == Phone:* ]]; then
@@ -41,27 +38,28 @@ if [[ "$action" == "Mount" ]]; then
 
 	chosen_dev=$(echo "$chosen" | awk '{print $1}')
 
-	if sudo mount "$chosen_dev" 2>/dev/null; then
-		notify-send "$chosen_dev mounted (default)"
-		exit 0
-	fi
-
 	dirs=$(find "$HOME/Usb" "$HOME/Data" /media -maxdepth 3 -type d 2>/dev/null)
 	mountpoint=$(echo "$dirs" | dmenu -i -p "Choose mount point:")
 	[[ -z "$mountpoint" ]] && exit 1
 
-	if [[ ! -d "$mountpoint" ]]; then
-		mkdiryn=$(printf "No\nYes" | dmenu -i -p "$mountpoint does not exist. Create it?")
-		[[ "$mkdiryn" == "Yes" ]] && sudo mkdir -p "$mountpoint"
-	fi
+	[[ ! -d "$mountpoint" ]] && mkdiryn=$(printf "No\nYes" | dmenu -i -p "$mountpoint does not exist. Create it?") && [[ "$mkdiryn" == "Yes" ]] && sudo mkdir -p "$mountpoint"
 
-	if sudo mount "$chosen_dev" "$mountpoint"; then
-		notify-send "$chosen_dev mounted to $mountpoint"
+	fstype=$(lsblk -no FSTYPE "$chosen_dev")
+
+	if [[ "$fstype" == "ntfs" || "$fstype" == "vfat" ]]; then
+		if sudo mount -o uid=1000,gid=1000,umask=000 "$chosen_dev" "$mountpoint"; then
+			notify-send "$chosen_dev mounted to $mountpoint"
+		else
+			notify-send "Failed to mount $chosen_dev"
+		fi
 	else
-		notify-send "Failed to mount $chosen_dev"
+		if sudo mount "$chosen_dev" "$mountpoint"; then
+			notify-send "$chosen_dev mounted to $mountpoint"
+		else
+			notify-send "Failed to mount $chosen_dev"
+		fi
 	fi
 
-# Unmount logic
 elif [[ "$action" == "Unmount" ]]; then
 	menu=""
 
